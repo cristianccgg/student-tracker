@@ -18,6 +18,7 @@ const MisEstudiantes = ({
   onEliminarEstudiante,
   onEliminarClase,
   onMarcarPagada,
+  onActualizarEstadoTodas,
   onActualizarNota,
   onAgregarClase,
 }) => {
@@ -38,6 +39,8 @@ const MisEstudiantes = ({
           (acc, clase) => acc + clase.precio,
           0,
         );
+
+        const todasPagadas = estudiante.clases.every((clase) => clase.pagada);
 
         return (
           <div
@@ -183,12 +186,30 @@ const MisEstudiantes = ({
                     </div>
                   ))}
                 </div>
-                <button
-                  onClick={() => setAbrirFormularioClase(estudiante.id)}
-                  className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
-                >
-                  + Agregar clase
-                </button>
+                <div className="flex justify-between">
+                  <button
+                    onClick={() => setAbrirFormularioClase(estudiante.id)}
+                    className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+                  >
+                    + Agregar clase
+                  </button>
+                  {estudiante.clases.length > 0 && (
+                    <button
+                      onClick={() =>
+                        onActualizarEstadoTodas(estudiante.id, !todasPagadas)
+                      }
+                      className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition ${
+                        todasPagadas
+                          ? "bg-amber-500 hover:bg-amber-600"
+                          : "bg-green-600 hover:bg-green-700"
+                      }`}
+                    >
+                      {todasPagadas
+                        ? "Marcar todas como pendientes"
+                        : "Marcar todas como pagadas"}
+                    </button>
+                  )}
+                </div>
               </div>
             )}
             {/* Formulario de clase */}

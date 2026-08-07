@@ -116,6 +116,21 @@ function App() {
       ),
     );
   };
+  const actualizarEstadoTodas = (idEstudiante, estado) => {
+    setEstudiantes((prevEstudiantes) =>
+      prevEstudiantes.map((estudiante) =>
+        estudiante.id === idEstudiante
+          ? {
+              ...estudiante,
+              clases: estudiante.clases.map((clase) => ({
+                ...clase,
+                pagada: estado,
+              })),
+            }
+          : estudiante,
+      ),
+    );
+  };
 
   const actualizarNota = (idEstudiante, idClase, notaNueva, precioNuevo) => {
     setEstudiantes((prevEstudiantes) =>
@@ -174,6 +189,7 @@ function App() {
             onEliminarEstudiante={eliminarEstudiante}
             onEliminarClase={eliminarClase}
             onMarcarPagada={marcarPagada}
+            onActualizarEstadoTodas={actualizarEstadoTodas}
             onActualizarNota={actualizarNota}
             onAgregarClase={agregarClase}
           />
