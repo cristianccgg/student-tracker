@@ -55,6 +55,14 @@ const MisEstudiantes = ({
           }
         };
 
+        const clasesOrdenadas = [...estudiante.clases].sort(
+          (a, b) => new Date(b.fecha) - new Date(a.fecha),
+        );
+
+        const arrayFechas = ["2025-05-10", "2023-01-01", "2026-03-15"];
+
+        arrayFechas.sort((a, b) => new Date(a) - new Date(b));
+
         return (
           <div
             key={estudiante.id}
@@ -176,7 +184,7 @@ const MisEstudiantes = ({
                 </div>
                 {/* Clases */}
                 <div className="mb-5 space-y-3">
-                  {estudiante.clases.map((clase) => (
+                  {clasesOrdenadas.map((clase) => (
                     <article
                       key={clase.id}
                       className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 shadow-sm"
