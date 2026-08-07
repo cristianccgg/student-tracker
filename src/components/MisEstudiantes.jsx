@@ -1,5 +1,5 @@
 import React from "react";
-import { Trash2, SquarePen } from "lucide-react";
+import { Trash2, SquarePen, ChevronDown, ChevronUp } from "lucide-react";
 
 const MisEstudiantes = ({
   estudiantes,
@@ -41,167 +41,290 @@ const MisEstudiantes = ({
         );
 
         const todasPagadas = estudiante.clases.every((clase) => clase.pagada);
+        const isOpen = estudiante.id === estudianteSeleccionado;
+
+        const toggleEstudiante = (e) => {
+          e.stopPropagation();
+          if (estudiante.id === estudianteSeleccionado) {
+            setEstudianteSeleccionado(null);
+          } else {
+            setEstudianteSeleccionado(estudiante.id);
+          }
+        };
 
         return (
           <div
-            onClick={(e) => {
-              e.stopPropagation();
-              setEstudianteSeleccionado(estudiante.id);
-            }}
             key={estudiante.id}
-            className="cursor-pointer rounded-xl bg-white p-5 shadow-sm transition hover:shadow-md"
+            className="cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md"
           >
-            <div className="flex items-center justify-between">
-              <p className="text-lg font-semibold text-slate-800">
-                {estudiante.nombre}
-              </p>
-              <div className="flex flex-col items-center">
-                <span className="text-sm text-slate-400">
-                  {clasesPendientes.length}{" "}
-                  {clasesPendientes.length === 1
-                    ? "clase pendiente"
-                    : "clases pendientes"}
-                </span>
-                <span className="text-sm text-slate-400">
-                  {totalPendientes}
-                </span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-sm text-slate-400">
-                  {clasesPagadas.length}{" "}
-                  {clasesPagadas.length === 1
-                    ? "clase pagada"
-                    : "clases pagadas"}
-                </span>
-                <span className="text-sm text-slate-400">{totalPagadas}</span>
-              </div>
-              <span className="text-sm text-slate-400">
-                {estudiante.clases.length}{" "}
-                {estudiante.clases.length === 1 ? "clase" : "clases"}
-              </span>
-              <button onClick={() => onEliminarEstudiante(estudiante.id)}>
-                <Trash2 />
-              </button>
-            </div>
-            {estudiante.id === estudianteSeleccionado && (
-              <div className="mt-5 border-t border-slate-100 pt-5">
-                <p className="mb-4 text-sm text-slate-500">
-                  {estudiante.materia}
-                </p>
-                {/* Clases */}
-                <div className="mb-5 space-y-2">
-                  {estudiante.clases.map((clase) => (
-                    <div
-                      key={clase.id}
-                      className="rounded-lg bg-slate-50 px-4 py-3"
-                    >
-                      <div className="flex justify-between">
-                        {abrirEditor === clase.id ? (
-                          <div>
-                            <textarea
-                              value={notaEditar}
-                              onChange={(e) => {
-                                setNotaEditar(e.target.value);
-                              }}
-                              rows="4"
-                              className="mb-4 w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-                            />
-                            <input
-                              value={inputPrecioEditar}
-                              onChange={(e) => {
-                                setInputPrecioEditar(e.target.value);
-                              }}
-                              type="number"
-                              className="w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-                            />
-                          </div>
-                        ) : (
-                          <div>
-                            <p className="text-sm text-slate-700">
-                              {clase.nota}
-                            </p>
-                            <p>${clase.precio}</p>
-                          </div>
-                        )}
+            <div
+              onClick={toggleEstudiante}
+              role="button"
+              tabIndex={0}
+              aria-expanded={isOpen}
+              aria-label={isOpen ? "Cerrar clases" : "Abrir clases"}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  toggleEstudiante(e);
+                }
+              }}
+              className={`flex flex-wrap items-center justify-between gap-4 rounded-xl px-3 py-3 transition duration-200 ${
+                isOpen
+                  ? "border border-sky-200 bg-sky-50/60"
+                  : "border border-transparent bg-slate-50/50 hover:bg-slate-50"
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleEstudiante(e);
+                  }}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700"
+                  aria-label={isOpen ? "Cerrar clases" : "Abrir clases"}
+                >
+                  {isOpen ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </button>
 
-                        <div className="flex gap-2">
-                          <p>{clase.pagada ? "Pagada" : "Pendiente"}</p>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onMarcarPagada(estudiante.id, clase.id);
-                            }}
-                            className={`relative h-6 w-11 rounded-full transition-colors ${
-                              clase.pagada ? "bg-green-500" : "bg-gray-300"
-                            }`}
-                          >
-                            <span
-                              className={`absolute left-0 top-1 h-4 w-4 rounded-full bg-white transition-transform ${
-                                clase.pagada ? "translate-x-6" : "translate-x-1"
-                              }`}
-                            />
-                          </button>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => {
-                              setInputPrecioEditar(clase.precio);
-                              setNotaEditar(clase.nota);
-                              setAbrirEditor(clase.id);
-                            }}
-                          >
-                            <SquarePen />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onEliminarClase(estudiante.id, clase.id);
-                            }}
-                          >
-                            <Trash2 />
-                          </button>
-                        </div>
-                      </div>
-                      {abrirEditor === clase.id && (
-                        <div className="flex gap-5 items-center mt-5">
-                          <button
-                            onClick={() => {
-                              onActualizarNota(
-                                estudiante.id,
-                                clase.id,
-                                notaEditar,
-                                inputPrecioEditar,
-                              );
-                              setAbrirEditor(null);
-                            }}
-                          >
-                            Actualizar
-                          </button>
-                          <button onClick={() => setAbrirEditor(null)}>
-                            Cancelar
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-800 text-sm font-bold text-white">
+                  {estudiante.nombre.charAt(0).toUpperCase()}
                 </div>
-                <div className="flex justify-between">
+                <div>
+                  <p className="text-lg font-semibold text-slate-800">
+                    {estudiante.nombre}
+                  </p>
+                  <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
+                    {estudiante.materia}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-center">
+                  <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-amber-500">
+                    Pendientes
+                  </span>
+                  <span className="mt-1 block text-sm font-bold text-slate-800">
+                    {clasesPendientes.length}
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    ${totalPendientes}
+                  </span>
+                </div>
+
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-center">
+                  <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-emerald-600">
+                    Pagadas
+                  </span>
+                  <span className="mt-1 block text-sm font-bold text-slate-800">
+                    {clasesPagadas.length}
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    ${totalPagadas}
+                  </span>
+                </div>
+
+                <div className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-center">
+                  <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+                    Total
+                  </span>
+                  <span className="mt-1 block text-sm font-bold text-slate-800">
+                    {estudiante.clases.length}
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    {estudiante.clases.length === 1 ? "clase" : "clases"}
+                  </span>
+                </div>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEliminarEstudiante(estudiante.id);
+                  }}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                  aria-label="Eliminar estudiante"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+            {isOpen && (
+              <div className="mt-6 border-t border-slate-100 pt-6">
+                <div className="mb-5 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                      Materia
+                    </span>
+                    <p className="mt-1 text-sm font-semibold text-slate-700">
+                      {estudiante.materia}
+                    </p>
+                  </div>
                   <button
                     onClick={() => setAbrirFormularioClase(estudiante.id)}
-                    className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+                    className="rounded-xl bg-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-sm transition hover:bg-slate-700 active:scale-[0.98]"
                   >
                     + Agregar clase
                   </button>
+                </div>
+                {/* Clases */}
+                <div className="mb-5 space-y-3">
+                  {estudiante.clases.map((clase) => (
+                    <article
+                      key={clase.id}
+                      className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 shadow-sm"
+                    >
+                      {abrirEditor === clase.id ? (
+                        <div className="rounded-2xl border border-sky-200 bg-white p-4">
+                          <div className="mb-4 flex items-center justify-between">
+                            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-sky-600">
+                              Editar clase
+                            </span>
+                            <span className="rounded-full bg-sky-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-sky-700">
+                              {clase.pagada ? "Pagada" : "Pendiente"}
+                            </span>
+                          </div>
+                          <div className="space-y-4">
+                            <div>
+                              <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                                Nota
+                              </label>
+                              <textarea
+                                value={notaEditar}
+                                onChange={(e) => {
+                                  setNotaEditar(e.target.value);
+                                }}
+                                rows="4"
+                                className="w-full resize-none rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100"
+                              />
+                            </div>
+                            <div>
+                              <label className="mb-2 block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+                                Precio
+                              </label>
+                              <input
+                                value={inputPrecioEditar}
+                                onChange={(e) => {
+                                  setInputPrecioEditar(e.target.value);
+                                }}
+                                type="number"
+                                className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100"
+                              />
+                            </div>
+                          </div>
+                          <div className="mt-5 flex flex-wrap items-center justify-end gap-3">
+                            <button
+                              onClick={() => setAbrirEditor(null)}
+                              className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-600 transition hover:bg-slate-50 hover:text-slate-800"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              onClick={() => {
+                                onActualizarNota(
+                                  estudiante.id,
+                                  clase.id,
+                                  notaEditar,
+                                  inputPrecioEditar,
+                                );
+                                setAbrirEditor(null);
+                              }}
+                              className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-emerald-700 active:scale-[0.98]"
+                            >
+                              Actualizar
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0 flex-1">
+                              <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                                Nota
+                              </span>
+                              <p className="whitespace-pre-wrap break-words text-sm leading-6 text-slate-700">
+                                {clase.nota}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setInputPrecioEditar(clase.precio);
+                                  setNotaEditar(clase.nota);
+                                  setAbrirEditor(clase.id);
+                                }}
+                                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700"
+                                aria-label="Editar clase"
+                              >
+                                <SquarePen className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onEliminarClase(estudiante.id, clase.id);
+                                }}
+                                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
+                                aria-label="Eliminar clase"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-4">
+                            <div className="min-w-[130px]">
+                              <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                                Precio
+                              </span>
+                              <p className="text-sm font-semibold text-slate-800">
+                                ${clase.precio}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center justify-end gap-3 rounded-full bg-white px-3 py-2 shadow-sm">
+                              <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+                                {clase.pagada ? "Pagada" : "Pendiente"}
+                              </span>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onMarcarPagada(estudiante.id, clase.id);
+                                }}
+                                className={`relative h-6 w-11 rounded-full border border-slate-200 transition-colors ${
+                                  clase.pagada
+                                    ? "bg-emerald-500"
+                                    : "bg-slate-300"
+                                }`}
+                              >
+                                <span
+                                  className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
+                                    clase.pagada ? "left-6" : "left-1"
+                                  }`}
+                                />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </article>
+                  ))}
+                </div>
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   {estudiante.clases.length > 0 && (
                     <button
                       onClick={() =>
                         onActualizarEstadoTodas(estudiante.id, !todasPagadas)
                       }
-                      className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition ${
+                      className={`rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white transition active:scale-[0.98] ${
                         todasPagadas
                           ? "bg-amber-500 hover:bg-amber-600"
-                          : "bg-green-600 hover:bg-green-700"
+                          : "bg-emerald-600 hover:bg-emerald-700"
                       }`}
                     >
                       {todasPagadas
@@ -220,71 +343,112 @@ const MisEstudiantes = ({
                   onAgregarClase(datosFormularioClase);
                   setAbrirFormularioClase(null);
                 }}
-                className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-5"
+                className="mt-5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
               >
-                <label
-                  htmlFor="nota"
-                  className="mb-2 block text-sm font-medium text-slate-700"
-                >
-                  Nota de la clase
-                </label>
-                <textarea
-                  value={datosFormularioClase.nota}
-                  onChange={(e) =>
-                    setDatosFormularioClase((prev) => ({
-                      ...prev,
-                      nota: e.target.value,
-                    }))
-                  }
-                  id="nota"
-                  name="nota"
-                  rows="4"
-                  className="mb-4 w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-                  placeholder="¿Qué trabajaron en esta clase?"
-                />
-                <div className="flex gap-5 items-center mb-4">
-                  <div className="flex gap-5 items-center">
-                    <label htmlFor="precio">Precio</label>
-                    <input
-                      value={datosFormularioClase.precio}
+                <div className="border-b border-slate-200 bg-slate-50 px-5 py-4">
+                  <h3 className="font-semibold text-slate-800">Nueva clase</h3>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Registra la información de la clase.
+                  </p>
+                </div>
+
+                <div className="space-y-5 p-5">
+                  <div>
+                    <label
+                      htmlFor="nota"
+                      className="mb-2 block text-sm font-medium text-slate-700"
+                    >
+                      Nota de la clase
+                    </label>
+
+                    <textarea
+                      value={datosFormularioClase.nota}
                       onChange={(e) =>
                         setDatosFormularioClase((prev) => ({
                           ...prev,
-                          precio: e.target.value,
+                          nota: e.target.value,
                         }))
                       }
-                      type="number"
-                      className="w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
+                      id="nota"
+                      name="nota"
+                      rows="4"
+                      className="w-full resize-none rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 outline-none transition focus:border-slate-500 focus:bg-white focus:ring-2 focus:ring-slate-200"
+                      placeholder="¿Qué trabajaron en esta clase?"
                     />
                   </div>
-                  <div className="flex items-center gap-5">
-                    <label htmlFor="pago">Pagada</label>
-                    <input
-                      onChange={(e) =>
-                        setDatosFormularioClase((prev) => ({
-                          ...prev,
-                          pagada: e.target.checked,
-                        }))
-                      }
-                      id="pago"
-                      type="checkbox"
-                      className="w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-200"
-                    />
+
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <div>
+                      <label
+                        htmlFor="precio"
+                        className="mb-2 block text-sm font-medium text-slate-700"
+                      >
+                        Precio
+                      </label>
+
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">
+                          $
+                        </span>
+
+                        <input
+                          value={datosFormularioClase.precio}
+                          onChange={(e) =>
+                            setDatosFormularioClase((prev) => ({
+                              ...prev,
+                              precio: e.target.value,
+                            }))
+                          }
+                          id="precio"
+                          type="number"
+                          placeholder="35000"
+                          className="w-full rounded-lg border border-slate-300 bg-slate-50 py-2 pl-7 pr-3 outline-none transition focus:border-slate-500 focus:bg-white focus:ring-2 focus:ring-slate-200"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="mb-2 block text-sm font-medium text-slate-700">
+                        Estado del pago
+                      </span>
+
+                      <label className="flex h-[42px] cursor-pointer items-center justify-between rounded-lg border border-slate-300 bg-slate-50 px-3 transition hover:bg-white">
+                        <span className="text-sm text-slate-600">
+                          {datosFormularioClase.pagada
+                            ? "Clase pagada"
+                            : "Pendiente"}
+                        </span>
+
+                        <input
+                          checked={datosFormularioClase.pagada}
+                          onChange={(e) =>
+                            setDatosFormularioClase((prev) => ({
+                              ...prev,
+                              pagada: e.target.checked,
+                            }))
+                          }
+                          type="checkbox"
+                          className="h-4 w-4 rounded border-slate-300"
+                        />
+                      </label>
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    type="submit"
-                    className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
-                  >
-                    Guardar
-                  </button>
+
+                <div className="flex justify-end gap-3 border-t border-slate-200 bg-slate-50 px-5 py-4">
                   <button
                     onClick={() => setAbrirFormularioClase(null)}
                     type="button"
-                    className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                    className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-400 hover:bg-slate-100 hover:text-slate-800"
                   >
                     Cancelar
+                  </button>
+
+                  <button
+                    type="submit"
+                    className="rounded-lg bg-slate-800 px-5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-slate-700 active:scale-[0.98]"
+                  >
+                    Guardar clase
                   </button>
                 </div>
               </form>
