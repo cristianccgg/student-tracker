@@ -24,10 +24,12 @@ function App() {
     nota: "",
     precio: "",
     pagada: false,
+    fecha: "",
   });
   const [abrirEditor, setAbrirEditor] = useState(null);
   const [inputPrecioEditar, setInputPrecioEditar] = useState("");
   const [notaEditar, setNotaEditar] = useState("");
+  const [fechaEditar, setFechaEditar] = useState("");
 
   useEffect(() => {
     localStorage.setItem("estudiantes", JSON.stringify(estudiantes));
@@ -71,6 +73,7 @@ function App() {
         nota: datosFormularioClase.nota,
         precio: Number(datosFormularioClase.precio),
         pagada: datosFormularioClase.pagada,
+        fecha: datosFormularioClase.fecha,
       };
       setEstudiantes((prevEstudiantes) =>
         prevEstudiantes.map((estudiante) =>
@@ -132,7 +135,13 @@ function App() {
     );
   };
 
-  const actualizarNota = (idEstudiante, idClase, notaNueva, precioNuevo) => {
+  const actualizarNota = (
+    idEstudiante,
+    idClase,
+    notaNueva,
+    precioNuevo,
+    fechaNueva,
+  ) => {
     setEstudiantes((prevEstudiantes) =>
       prevEstudiantes.map((estudiante) =>
         estudiante.id === idEstudiante
@@ -140,7 +149,12 @@ function App() {
               ...estudiante,
               clases: estudiante.clases.map((clase) =>
                 clase.id === idClase
-                  ? { ...clase, nota: notaNueva, precio: Number(precioNuevo) }
+                  ? {
+                      ...clase,
+                      nota: notaNueva,
+                      precio: Number(precioNuevo),
+                      fecha: fechaNueva,
+                    }
                   : clase,
               ),
             }
@@ -178,12 +192,14 @@ function App() {
             abrirEditor={abrirEditor}
             notaEditar={notaEditar}
             inputPrecioEditar={inputPrecioEditar}
+            fechaEditar={fechaEditar}
             abrirFormularioClase={abrirFormularioClase}
             datosFormularioClase={datosFormularioClase}
             setEstudianteSeleccionado={setEstudianteSeleccionado}
             setAbrirEditor={setAbrirEditor}
             setNotaEditar={setNotaEditar}
             setInputPrecioEditar={setInputPrecioEditar}
+            setFechaEditar={setFechaEditar}
             setAbrirFormularioClase={setAbrirFormularioClase}
             setDatosFormularioClase={setDatosFormularioClase}
             onEliminarEstudiante={eliminarEstudiante}
