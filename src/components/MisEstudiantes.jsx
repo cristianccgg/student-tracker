@@ -269,10 +269,10 @@ const MisEstudiantes = ({
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0 flex-1">
                               <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
-                                Nota
+                                Nota / {clase.fecha}
                               </span>
                               <p className="whitespace-pre-wrap break-words text-sm leading-6 text-slate-700">
-                                {clase.nota} / {clase.fecha}
+                                {clase.nota}
                               </p>
                             </div>
 
