@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import AgregarEstudiante from "./components/AgregarEstudiante";
 import MisEstudiantes from "./components/MisEstudiantes";
 import Estadisticas from "./components/Estadisticas";
+import Buscador from "./components/Buscador";
+import FiltroEstudiantes from "./components/FiltroEstudiantes";
 import "./App.css";
 
 function App() {
@@ -30,6 +32,13 @@ function App() {
   const [inputPrecioEditar, setInputPrecioEditar] = useState("");
   const [notaEditar, setNotaEditar] = useState("");
   const [fechaEditar, setFechaEditar] = useState("");
+  const [abrirEditorEstudiante, setAbrirEditorEstudiante] = useState(null);
+  const [nombreEditar, setNombreEditar] = useState("");
+  const [materiaEditar, setMateriaEditar] = useState("");
+  const [abrirModalConfirmacion, setAbrirModalConfirmacion] = useState(null);
+  const [claseAEliminar, setClaseAEliminar] = useState(null);
+  const [busquedaText, setBusquedaText] = useState("");
+  const [filtroActivo, setFiltroActivo] = useState("todos");
 
   useEffect(() => {
     localStorage.setItem("estudiantes", JSON.stringify(estudiantes));
@@ -163,6 +172,30 @@ function App() {
     );
   };
 
+  const actualizarEstudiante = (idEstudiante, nuevoNombre, nuevaMateria) => {
+    setEstudiantes((prevEstudiantes) =>
+      prevEstudiantes.map((estudiante) =>
+        estudiante.id === idEstudiante
+          ? { ...estudiante, nombre: nuevoNombre, materia: nuevaMateria }
+          : estudiante,
+      ),
+    );
+  };
+
+  const estudiantesFiltrados = estudiantes.filter((estudiante) =>
+    estudiante.nombre.toLowerCase().includes(busquedaText.toLowerCase()),
+  );
+
+  const filtradosAlDia = estudiantes.filter(
+    (estudiante) =>
+      estudiante.clases.length > 0 &&
+      estudiante.clases.every((clase) => clase.pagada),
+  );
+
+  const filtradosPendientes = estudiantes.filter((estudiante) =>
+    estudiante.clases.some((clase) => !clase.pagada),
+  );
+
   return (
     <div className="min-h-screen bg-slate-100 px-6 py-10">
       <div className="mx-auto max-w-4xl">
@@ -186,28 +219,50 @@ function App() {
           <h2 className="mb-4 text-xl font-semibold text-slate-800">
             Mis estudiantes
           </h2>
+          <Buscador
+            busquedaText={busquedaText}
+            setBusquedaText={setBusquedaText}
+          />
+          <FiltroEstudiantes
+            filtroActivo={filtroActivo}
+            setFiltroActivo={setFiltroActivo}
+          />
+
           <MisEstudiantes
             estudiantes={estudiantes}
             estudianteSeleccionado={estudianteSeleccionado}
+            estudiantesFiltrados={estudiantesFiltrados}
             abrirEditor={abrirEditor}
+            abrirEditorEstudiante={abrirEditorEstudiante}
             notaEditar={notaEditar}
             inputPrecioEditar={inputPrecioEditar}
             fechaEditar={fechaEditar}
+            nombreEditar={nombreEditar}
+            materiaEditar={materiaEditar}
+            claseAEliminar={claseAEliminar}
             abrirFormularioClase={abrirFormularioClase}
             datosFormularioClase={datosFormularioClase}
+            abrirEditorEstudiante={abrirEditorEstudiante}
+            abrirModalConfirmacion={abrirModalConfirmacion}
             setEstudianteSeleccionado={setEstudianteSeleccionado}
             setAbrirEditor={setAbrirEditor}
             setNotaEditar={setNotaEditar}
             setInputPrecioEditar={setInputPrecioEditar}
             setFechaEditar={setFechaEditar}
+            setNombreEditar={setNombreEditar}
+            setMateriaEditar={setMateriaEditar}
             setAbrirFormularioClase={setAbrirFormularioClase}
             setDatosFormularioClase={setDatosFormularioClase}
+            setAbrirEditorEstudiante={setAbrirEditorEstudiante}
+            setAbrirModalConfirmacion={setAbrirModalConfirmacion}
+            setClaseAEliminar={setClaseAEliminar}
             onEliminarEstudiante={eliminarEstudiante}
             onEliminarClase={eliminarClase}
             onMarcarPagada={marcarPagada}
             onActualizarEstadoTodas={actualizarEstadoTodas}
             onActualizarNota={actualizarNota}
             onAgregarClase={agregarClase}
+            onActualizarEstudiante={actualizarEstudiante}
           />
         </div>
         {/* Estadísticas */}

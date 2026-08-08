@@ -1,33 +1,49 @@
 import React from "react";
 import { Trash2, SquarePen, ChevronDown, ChevronUp } from "lucide-react";
 import FormularioClase from "./FormularioClase";
+import ModalConfirmacion from "./ModalConfirmacion";
 
 const MisEstudiantes = ({
   estudiantes,
   estudianteSeleccionado,
+  estudiantesFiltrados,
   abrirEditor,
+  abrirEditorEstudiante,
+  abrirModalConfirmacion,
   notaEditar,
   inputPrecioEditar,
+  fechaEditar,
+  nombreEditar,
+  materiaEditar,
   abrirFormularioClase,
   datosFormularioClase,
+  claseAEliminar,
   setEstudianteSeleccionado,
   setAbrirEditor,
   setNotaEditar,
   setInputPrecioEditar,
+  setNombreEditar,
+  setMateriaEditar,
   setAbrirFormularioClase,
   setDatosFormularioClase,
+  setAbrirEditorEstudiante,
+  setAbrirModalConfirmacion,
+  setFechaEditar,
+  setClaseAEliminar,
   onEliminarEstudiante,
   onEliminarClase,
   onMarcarPagada,
   onActualizarEstadoTodas,
   onActualizarNota,
   onAgregarClase,
-  fechaEditar,
-  setFechaEditar,
+  onActualizarEstudiante,
 }) => {
+  const estudianteAEliminar = estudiantes.find(
+    (estudiante) => estudiante.id === abrirModalConfirmacion,
+  );
   return (
     <div className="space-y-4">
-      {estudiantes.map((estudiante) => {
+      {estudiantesFiltrados.map((estudiante) => {
         const clasesPagadas = estudiante.clases.filter((clase) => clase.pagada);
         const clasesPendientes = estudiante.clases.filter(
           (clase) => !clase.pagada,
@@ -80,7 +96,7 @@ const MisEstudiantes = ({
                   toggleEstudiante(e);
                 }
               }}
-              className={`flex flex-wrap items-center justify-between gap-4 rounded-xl px-3 py-3 transition duration-200 ${
+              className={`flex flex-wrap items-start justify-between gap-4 rounded-xl px-3 py-3 transition duration-200 ${
                 isOpen
                   ? "border border-sky-200 bg-sky-50/60"
                   : "border border-transparent bg-slate-50/50 hover:bg-slate-50"
@@ -106,16 +122,59 @@ const MisEstudiantes = ({
                   {estudiante.nombre.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-lg font-semibold text-slate-800">
-                    {estudiante.nombre}
-                  </p>
-                  <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
-                    {estudiante.materia}
-                  </p>
+                  {abrirEditorEstudiante !== estudiante.id ? (
+                    <div>
+                      <p className="text-lg font-semibold text-slate-800">
+                        {estudiante.nombre}
+                      </p>
+                      <p className="text-xs font-medium uppercase tracking-[0.2em] text-slate-400">
+                        {estudiante.materia}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col w-fit gap-2">
+                      {" "}
+                      <input
+                        value={nombreEditar}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => setNombreEditar(e.target.value)}
+                        type="text"
+                        className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100"
+                      />
+                      <input
+                        value={materiaEditar}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => setMateriaEditar(e.target.value)}
+                        type="text"
+                        className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 outline-none transition focus:border-sky-500 focus:ring-4 focus:ring-sky-100"
+                      />
+                      <div className="flex justify-evenly">
+                        <button
+                          onClick={() => {
+                            onActualizarEstudiante(
+                              estudiante.id,
+                              nombreEditar,
+                              materiaEditar,
+                            );
+                            setAbrirEditorEstudiante(null);
+                          }}
+                          className="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white transition hover:bg-emerald-700 active:scale-[0.98]"
+                        >
+                          Actualizar
+                        </button>
+                        <button
+                          onClick={() => setAbrirEditorEstudiante(null)}
+                          className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-slate-600 transition hover:bg-slate-50 hover:text-slate-800"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-start gap-2">
                 <div className="rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-center">
                   <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-amber-500">
                     Pendientes
@@ -151,11 +210,23 @@ const MisEstudiantes = ({
                     {estudiante.clases.length === 1 ? "clase" : "clases"}
                   </span>
                 </div>
-
+              </div>
+              <div className="flex items-center gap-2">
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onEliminarEstudiante(estudiante.id);
+                    setAbrirEditorEstudiante(estudiante.id);
+                    setNombreEditar(estudiante.nombre);
+                    setMateriaEditar(estudiante.materia);
+                  }}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                >
+                  <SquarePen />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setAbrirModalConfirmacion(estudiante.id);
                   }}
                   className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
                   aria-label="Eliminar estudiante"
@@ -164,6 +235,7 @@ const MisEstudiantes = ({
                 </button>
               </div>
             </div>
+
             {isOpen && (
               <div className="mt-6 border-t border-slate-100 pt-6">
                 <div className="mb-5 flex items-center justify-between">
@@ -293,7 +365,11 @@ const MisEstudiantes = ({
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  onEliminarClase(estudiante.id, clase.id);
+                                  setClaseAEliminar({
+                                    id: clase.id,
+                                    idEstudiante: estudiante.id,
+                                    nota: clase.nota,
+                                  });
                                 }}
                                 className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
                                 aria-label="Eliminar clase"
@@ -373,6 +449,26 @@ const MisEstudiantes = ({
           </div>
         );
       })}
+
+      {claseAEliminar && (
+        <ModalConfirmacion
+          titulo={"clase"}
+          mensaje={claseAEliminar.nota}
+          onCancelar={() => setClaseAEliminar(null)}
+          onConfirmar={() =>
+            onEliminarClase(claseAEliminar.idEstudiante, claseAEliminar.id)
+          }
+        />
+      )}
+
+      {estudianteAEliminar && (
+        <ModalConfirmacion
+          titulo={"estudiante"}
+          mensaje={estudianteAEliminar.nombre}
+          onCancelar={() => setAbrirModalConfirmacion(null)}
+          onConfirmar={() => onEliminarEstudiante(estudianteAEliminar.id)}
+        />
+      )}
     </div>
   );
 };
